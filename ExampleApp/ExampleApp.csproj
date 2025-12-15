@@ -1,11 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     </PropertyGroup>
+
+    <PropertyGroup Label="AOT" Condition="'$(Configuration)'=='Release'">
+        <PublishAot>true</PublishAot>
+        <TrimMode>full</TrimMode>
+        <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+        <StaticExecutable>true</StaticExecutable>
+    </PropertyGroup>
+
+    <ItemGroup Label="Linker" Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+        <DirectPInvoke Include="libHarfBuzzSharp"/>
+        <DirectPInvoke Include="libSkiaSharp"/>
+        <DirectPInvoke Include="av_libglesv2"/>
+        <LinkerArg Include="d3d9.lib;dxguid.lib"/>
+        <LinkerArg Include="dxgi.lib"/>
+        <LinkerArg Include="Gdi32.lib;User32.lib"/>
+        <LinkerArg Include="synchronization.lib"/>
+        <LinkerArg Include="fontsub.lib;Ole32.lib;USP10.lib"/>
+        <LinkerArg Include="d3d12.lib;d3dcompiler.lib"/>
+    </ItemGroup>
+
+    <ItemGroup Label="Trimmer" Condition="'$(Configuration)'=='Release'">
+        <TrimmerRootAssembly Include="Avalonia.Themes.Fluent"/>
+    </ItemGroup>
 
     <ItemGroup>
         <Folder Include="Models\"/>
@@ -13,15 +36,21 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.9"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.9"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.9"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.9"/>
+        <!-- newer builds have broken XAML previews: designer dll is moved to a folder that plugin does not expect -->
+        <PackageReference Include="Avalonia" Version="12.0.999-cibuild0060239-alpha" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.0.999-cibuild0060239-alpha"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.999-cibuild0060239-alpha"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.999-cibuild0060239-alpha"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.9">
+        <PackageReference Include="Avalonia.Diagnostics" Version="12.0.999-cibuild0060239-alpha">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
+
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
+        <PackageReference Include="2ndLAB.ANGLE.Static" Version="7151.0.0-10.0.26100.0-1.79e529b"/>
+        <PackageReference Include="2ndLAB.SkiaSharp.Static" Version="3.119.0-10.0.26100.0-1.1c7d845"/>
+        <PackageReference Include="VC-LTL" Version="5.3.1" />
     </ItemGroup>
+
 </Project>
